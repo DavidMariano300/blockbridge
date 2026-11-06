@@ -1,124 +1,134 @@
-# BlockBridge Academy v2
+# BlockBridge Academy
 
-Quizzes de programación con bloques: el estudiante arma el programa con bloques, ve el código en 8 lenguajes (Java, Kotlin, C#, C++, C, Python, JavaScript y PHP) y recibe una calificación de 0 a 100. El docente crea ejercicios y quizzes y consulta los resultados de su grupo. Requisitos, casos de uso y diseño en [docs/](docs/00-vision-alcance-stack.md).
+Programming quizzes built with blocks. Students assemble a program with blocks, see the generated code in 8 languages (Java, Kotlin, C#, C++, C, Python, JavaScript and PHP) and get a score from 0 to 100. Teachers create exercises and quizzes and review their students' results.
 
-**Sitio:** https://blockbridge-academy.vercel.app
+**Live site:** https://blockbridge-academy.vercel.app
 
-**Stack:** HTML + CSS + JavaScript nativo (sin compilación) · Blockly · Firebase Authentication y Firestore · Vercel Functions.
+**Stack:** HTML + CSS + vanilla JavaScript (no build step) · Blockly · Firebase Authentication and Firestore · Vercel Functions.
 
-## Estado
+The app and its engineering documents ([docs/](docs/00-vision-alcance-stack.md)) are in Spanish, because the project targets Spanish-speaking students.
 
-| Iteración | Contenido | Estado |
+## Highlights
+
+- **Structural grading:** answers are compared block by block against registered solutions, on the server. Variable names don't affect the result, and the feedback points to the block where the program diverges.
+- **Eight code generators** that share a type inference and class analysis layer. Reference programs are compiled and run in the tests.
+- **No back doors:** clients can't write exercises, quizzes or sessions. Those writes go through the API, and roles can only be changed from the Firebase console.
+- **Privacy:** data export, account deletion and automatic retention cleanup.
+- **Tested and audited:** 278 unit tests, 45 tests against the Firebase emulators, a WCAG 2.1 AA audit with axe-core and a security review.
+
+## Status
+
+| Iteration | Scope | Status |
 |---|---|---|
-| 0 | Documentación de Ingeniería de Software | Hecha |
-| 1 | Autenticación (invitado, registro, vinculación, login, recuperación), perfil y reglas de Firestore con pruebas | Hecha |
-| 2 | Catálogo de bloques, generadores de Python y JavaScript, práctica libre | Hecha |
-| 3 | Quiz completo: sesiones, comparación estructural, pistas, puntaje y resumen | Hecha |
-| 4 | Generadores de Java, Kotlin, C#, C++, C y PHP; banco de 27 ejercicios y 10 quizzes | Hecha |
-| 5 | Panel docente: ejercicios con vista previa, quizzes, resultados, CSV y PDF | Hecha |
-| 6 | Privacidad (descargar datos, eliminar cuenta, TTL, limpieza diaria), historial, términos de uso, auditoría de accesibilidad | Hecha |
-| — | Despliegue en Firebase y Vercel | Hecho: https://blockbridge-academy.vercel.app |
+| 0 | Software engineering documentation | Done |
+| 1 | Authentication (guest, sign-up, account linking, login, recovery), profiles and tested Firestore rules | Done |
+| 2 | Block catalog, Python and JavaScript generators, free practice | Done |
+| 3 | Full quiz flow: sessions, structural comparison, hints, scoring and summary | Done |
+| 4 | Java, Kotlin, C#, C++, C and PHP generators; bank of 27 exercises and 10 quizzes | Done |
+| 5 | Teacher panel: exercises with preview, quizzes, results, CSV and PDF | Done |
+| 6 | Privacy (data download, account deletion, daily cleanup), history, terms of use, accessibility audit | Done |
+| — | Deployment on Firebase and Vercel | Done |
 
-## Desarrollo local
+## Local development
 
-Requisitos: Node 18 o superior, Java 11 o superior y Python 3 (para las pruebas). Ejecuta `npm install` una vez. Los scripts descargan Node 22 y `firebase-tools` 13.35.1 la primera vez, sin instalar nada en el sistema; se usa la versión 13 porque la 14 en adelante exige Java 21.
+Requirements: Node 18 or later, Java 11 or later and Python 3 (for the tests). Run `npm install` once. The scripts download Node 22 and `firebase-tools` 13.35.1 on first use without installing anything system-wide; version 13 is used because 14 and later require Java 21.
 
-En una terminal, los emuladores de Auth (9099) y Firestore (8085), con su interfaz en http://127.0.0.1:4000:
+In one terminal, start the Auth (9099) and Firestore (8085) emulators, with their UI at http://127.0.0.1:4000:
 
 ```bash
 npm run emuladores
 ```
 
-En otra, carga el banco de ejercicios (los emuladores no guardan datos: se repite al reiniciarlos):
+In another, load the exercise bank (the emulators don't persist data, so repeat this after restarting them):
 
 ```bash
 npm run seed
 ```
 
-Opcional: datos de demostración con un docente, 8 alumnos ficticios y 47 sesiones. Las credenciales de prueba están en [scripts/demo.js](scripts/demo.js) y solo funcionan en los emuladores:
+Optional demo data, with one teacher, 8 fictional students and 47 sessions. The test credentials are in [scripts/demo.js](scripts/demo.js) and only work on the emulators:
 
 ```bash
 npm run demo
 ```
 
-Y el sitio, con las funciones de `/api`, en http://localhost:5173:
+Then start the site and the `/api` functions at http://localhost:5173:
 
 ```bash
 npm run dev
 ```
 
-En `localhost` la app se conecta sola a los emuladores con el proyecto `demo-blockbridge`, que no existe en la nube. Los correos de verificación y recuperación aparecen en la pestaña *Authentication* de la interfaz de los emuladores.
+On `localhost` the app connects to the emulators automatically, using the `demo-blockbridge` project, which doesn't exist in the cloud. Verification and recovery emails appear in the *Authentication* tab of the emulator UI.
 
-## Pruebas
+## Tests
 
-Evaluador, generadores, banco y retención. Cada programa de referencia y cada solución del banco se genera, se compila con advertencias como errores y se ejecuta en los lenguajes cuyo compilador esté instalado (`javac`, `gcc`, `g++`, `python3` y `node`; también `kotlinc`, `csc` + `dotnet` y `php` si existen); el resto se omite avisándolo. Kotlin, C# y PHP tienen además pruebas de formato exacto:
+Evaluator, generators, exercise bank and retention. Every reference program and every bank solution is generated, compiled with warnings as errors and run in each language whose compiler is installed (`javac`, `gcc`, `g++`, `python3` and `node`, plus `kotlinc`, `csc` + `dotnet` and `php` if present). The rest are skipped with a notice. Kotlin, C# and PHP also have exact-format tests:
 
 ```bash
 npm test
 ```
 
-Reglas de Firestore y API contra los emuladores: sin puertas traseras, sesiones ajenas, bloques no permitidos, límite de envíos, pistas, puntaje, panel docente, eliminación de cuenta y limpieza. Detén antes `npm run emuladores`, porque esta prueba levanta los suyos:
+Firestore rules and API against the emulators: back doors, other users' sessions, disallowed blocks, rate limits, hints, scoring, teacher panel, account deletion and cleanup. Stop `npm run emuladores` first, because this command starts its own:
 
 ```bash
 npm run test:emulador
 ```
 
-## Asignar el rol docente
+## Assigning the teacher role
 
-No existe ningún endpoint ni pantalla para cambiar roles: esa es la garantía de que no hay puertas traseras. Procedimiento completo en [docs/02-casos-de-uso.md](docs/02-casos-de-uso.md) (CU-15):
+There is no endpoint or screen for changing roles, which is what guarantees there are no back doors. The full procedure is in [docs/02-casos-de-uso.md](docs/02-casos-de-uso.md) (CU-15):
 
-1. El docente se registra y verifica su correo.
-2. El DBA cambia `usuarios/{uid}.rol` a `"docente"` en la Consola de Firebase (en local, en la interfaz de los emuladores).
-3. El docente pulsa «Ya verifiqué mi correo» o vuelve a iniciar sesión, y le aparece «Panel docente» en el encabezado.
+1. The teacher signs up and verifies their email.
+2. The DBA changes `usuarios/{uid}.rol` to `"docente"` in the Firebase console (locally, in the emulator UI).
+3. The teacher signs in again and sees «Panel docente» in the header.
 
-## Puesta en producción
+## Production
 
-El sitio está en https://blockbridge-academy.vercel.app (proyecto de Firebase `blockbridge-academy`). Estos pasos sirven para repetir el despliegue en otro proyecto. `package.json` fija `jose` en 4.15.9 porque el runtime de Vercel no admite el `require()` que `jwks-rsa` hace de `jose` 6, que solo es ESM.
+The site runs at https://blockbridge-academy.vercel.app (Firebase project `blockbridge-academy`). To deploy it to another project:
 
-1. Crea el proyecto en Firebase. En *Authentication*, habilita los proveedores **Anónimo** y **Correo/contraseña**, la política de contraseñas (8 caracteres con letras y números) y la protección contra enumeración de correos.
-2. Crea Firestore y publica las reglas:
+1. Create a Firebase project. In *Authentication*, enable the **Anonymous** and **Email/password** providers, a password policy and email enumeration protection.
+2. Create Firestore and publish the rules:
    ```bash
-   npm run firebase -- deploy --only firestore:rules --project TU_PROYECTO
+   npm run firebase -- deploy --only firestore:rules --project YOUR_PROJECT
    ```
-   Las sesiones de invitado vencidas las borra `/api/limpieza` a diario. La política TTL de `firestore.indexes.json` es opcional y exige facturación activa (plan Blaze); para publicarla, agrega `firestore:indexes` al comando.
-3. Copia la configuración web del proyecto en `PRODUCCION`, dentro de [js/firebase.js](js/firebase.js).
-4. Genera una clave de cuenta de servicio (Configuración del proyecto, Cuentas de servicio). En Vercel define dos variables de entorno: `FIREBASE_SERVICE_ACCOUNT` con el JSON completo de la clave y `CRON_SECRET` con una cadena aleatoria (`openssl rand -hex 32`). Nunca las subas al repositorio.
-5. Carga el banco con la misma clave y borra después el archivo:
+   Expired guest sessions are deleted daily by `/api/limpieza`. The TTL policy in `firestore.indexes.json` is optional and requires active billing (Blaze plan); to publish it, add `firestore:indexes` to the command.
+3. Copy the project's web configuration into `PRODUCCION`, in [js/firebase.js](js/firebase.js).
+4. Generate a service account key (Project settings, Service accounts). In Vercel, set two environment variables: `FIREBASE_SERVICE_ACCOUNT` with the full JSON key and `CRON_SECRET` with a random string (`openssl rand -hex 32`). Never commit them.
+5. Load the exercise bank with the same key, then delete the file:
    ```bash
-   FIREBASE_SERVICE_ACCOUNT="$(cat clave.json)" npm run seed
+   FIREBASE_SERVICE_ACCOUNT="$(cat key.json)" npm run seed
    ```
-6. Importa la carpeta en Vercel (Node 22). [vercel.json](vercel.json) ya trae los encabezados de seguridad (CSP) y la tarea diaria `/api/limpieza`; `.vercelignore` deja fuera pruebas, scripts y el respaldo de la v1.
-7. [privacidad.html](privacidad.html) y [terminos.html](terminos.html) están escritos para un proyecto académico. Para atender a personas reales, agrega al responsable con su domicilio y contacto y haz que alguien con conocimientos legales los revise.
+6. Import the folder into Vercel (Node 22). [vercel.json](vercel.json) already includes the security headers (CSP) and the daily `/api/limpieza` job; `.vercelignore` leaves out tests, scripts and internal files. `package.json` pins `jose` to 4.15.9 because the Vercel runtime doesn't support the `require()` that `jwks-rsa` makes of `jose` 6, which is ESM-only.
+7. [privacidad.html](privacidad.html) and [terminos.html](terminos.html) are written for an academic project. To serve real users, add the data controller's name, address and contact details, and have someone with legal expertise review them.
 
-Los 27 ejercicios precargados y sus soluciones están en este repositorio, así que sirven para practicar. Para calificar de verdad usa ejercicios creados por el docente: viven en Firestore y sus soluciones nunca llegan al navegador.
+The 27 preloaded exercises and their solutions are in this repository, so they are meant for practice. For real grading, use exercises created by teachers: those live in Firestore and their solutions never reach the browser.
 
-### Protección contra abuso
+### Abuse protection
 
-`/api/sesiones` admite 20 sesiones nuevas por usuario cada hora. Para rechazar además a los clientes automatizados, con App Check:
+`/api/sesiones` allows 20 new sessions per user per hour. To also reject automated clients with App Check:
 
-1. Crea una clave de reCAPTCHA para tu dominio y copia la clave de sitio (pública) en `RECAPTCHA_SITIO`, dentro de [js/firebase.js](js/firebase.js). Cualquier clave secreta se queda fuera del repositorio.
-2. En la Consola de Firebase, en *App Check*, registra la app web con el proveedor Fraud Defense (reCAPTCHA Enterprise). Despliega el sitio.
-3. Comprueba en las métricas de App Check que las peticiones llegan verificadas. Luego define `EXIGIR_APP_CHECK=si` en Vercel, vuelve a desplegar y activa la aplicación obligatoria para Firestore en la consola.
+1. Create a reCAPTCHA key for your domain and copy the site key (public) into `RECAPTCHA_SITIO`, in [js/firebase.js](js/firebase.js). Any secret key stays out of the repository.
+2. In the Firebase console, under *App Check*, register the web app with the Fraud Defense provider (reCAPTCHA Enterprise). Deploy the site.
+3. Check in the App Check metrics that requests arrive verified. Then set `EXIGIR_APP_CHECK=si` in Vercel, redeploy and turn on enforcement for Firestore in the console.
 
-El plan Hobby de Vercel es para uso no comercial: sirve para el proyecto académico. Para usarlo con una institución, cambia a Vercel Pro o a Firebase Hosting con Cloud Functions.
+Vercel's Hobby plan is for non-commercial use, which fits this academic project. To use it with an institution, move to Vercel Pro or to Firebase Hosting with Cloud Functions.
 
-## Estructura
+## Structure
 
 ```
-index.html practica.html quiz.html cuenta.html docente.html   páginas
-privacidad.html terminos.html            avisos legales
-css/app.css                              sistema de diseño: tokens claro/oscuro y componentes
-fonts/                                   Atkinson Hyperlegible Next y Mono (OFL), alojadas localmente
-js/interfaz.js                           tema claro/oscuro y menú móvil (se carga en <head>)
-js/firebase.js js/sesion.js js/api.js    Firebase, sesión y encabezado, llamadas a /api
-js/editor.js js/codigo.js js/retro.js    editor de bloques, código generado y retroalimentación
-js/inicio.js js/practica.js js/quiz.js js/cuenta.js   lógica de cada página
-js/docente*.js                           panel docente: listas y quizzes, editor de ejercicios, resultados
-js/bloques/                              bloques, evaluador, validación y un generador por lenguaje
-api/                                     funciones de Vercel; api/_lib: Firebase Admin, HTTP, sesión, cuenta y retención
-contenido/banco.js                       banco precargado (27 ejercicios, 10 quizzes)
-scripts/                                 servidor de desarrollo, carga del banco, datos de demostración
-firestore.rules  firestore.indexes.json  reglas y política TTL
-test/                                    pruebas (node:test)
-docs/                                    documentación en Markdown y PDF (./docs/generar-pdf.sh)
+index.html practica.html quiz.html cuenta.html docente.html   pages
+privacidad.html terminos.html            legal notices
+css/app.css                              design system: light/dark tokens and components
+fonts/                                   Atkinson Hyperlegible Next and Mono (OFL), self-hosted
+js/interfaz.js                           light/dark theme and mobile menu (loaded in <head>)
+js/firebase.js js/sesion.js js/api.js    Firebase, session and header, /api calls
+js/editor.js js/codigo.js js/retro.js    block editor, generated code and feedback
+js/inicio.js js/practica.js js/quiz.js js/cuenta.js   per-page logic
+js/docente*.js                           teacher panel: lists and quizzes, exercise editor, results
+js/bloques/                              blocks, evaluator, validation and one generator per language
+api/                                     Vercel functions; api/_lib: Firebase Admin, HTTP, session, account and retention
+contenido/banco.js                       preloaded bank (27 exercises, 10 quizzes)
+scripts/                                 dev server, bank loader, demo data
+firestore.rules  firestore.indexes.json  rules and TTL policy
+test/                                    tests (node:test)
+docs/                                    Markdown and PDF documentation (./docs/generar-pdf.sh)
 ```
