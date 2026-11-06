@@ -1,0 +1,83 @@
+rules_version = '2';
+
+// Matriz de permisos: docs/04-diagramas.md §5. Todo lo que no se permite aquí está denegado.
+// El servidor (Admin SDK en /api) no pasa por estas reglas.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function autenticado() {
+      return request.auth != null;
+    }
+
+    function ruta(coleccion, id) {
+      return /databases/$(database)/documents/$(coleccion)/$(id);
+    }
+
+    // El rol vive en usuarios/{uid}.rol y solo el DBA lo cambia desde la consola (CU-15).
+    function esDocente() {
+      return autenticado()
+        && request.auth.token.email_verified == true
+        && exists(ruta('usuarios', request.auth.uid))
+        && get(ruta('usuarios', request.auth.uid)).data.rol == 'docente';
+    }
+
+    function apodoValido(a) {
+      return a is string && a.size() >= 3 && a.size() <= 30;
+    }
+
+    function textoValido(t, max) {
+      return t is string && t.size() >= 1 && t.size() <= max;
+    }
+
+    function sinCambio(campo) {
+      return request.resource.data.get(campo, null) == resource.data.get(campo, null);
+    }
+
+    match /usuarios/{uid} {
+      allow read: if autenticado() && request.auth.uid == uid;
+
+      // Solo cuentas registradas (no anónimas) y siempre con rol "estudiante" (RN-14).
+      allow create: if autenticado() && request.auth.uid == uid
+        && request.auth.token.firebase.sign_in_provider != 'anonymous'
+        && request.resource.data.keys().hasOnly(['apodo', 'rol', 'avisoVersion', 'avisoAceptadoEn', 'creadoEn'])
+        && request.resource.data.keys().hasAll(['apodo', 'rol', 'avisoVersion', 'avisoAceptadoEn', 'creadoEn'])
+        && request.resource.data.rol == 'estudiante'
+        && apodoValido(request.resource.data.apodo)
+        && textoValido(request.resource.data.avisoVersion, 10)
+        && request.resource.data.avisoAceptadoEn == request.time
+        && request.resource.data.creadoEn == request.time;
+
+      // El usuario solo cambia su apodo o vuelve a aceptar el aviso; nunca su rol.
+      allow update: if autenticado() && request.auth.uid == uid
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['apodo', 'avisoVersion', 'avisoAceptadoEn'])
+        && apodoValido(request.resource.data.apodo)
+        && textoValido(request.resource.data.avisoVersion, 10)
+        && (sinCambio('avisoAceptadoEn') || request.resource.data.avisoAceptadoEn == request.time);
+
+      // Borrar la cuenta lo hace el servidor (DELETE /api/cuenta) para borrar también las sesiones.
+    }
+
+    // Ejercicios y quizzes los escribe solo el servidor (/api/ejercicios, /api/quizzes), que los valida
+    // con las mismas reglas que el banco. Los estudiantes no leen ejercicios: los reciben de /api/sesiones.
+    match /ejercicios/{id} {
+      allow read: if esDocente();
+
+      // Soluciones, pistas y explicación: solo su autor, para editarlas.
+      match /privado/{doc} {
+        allow read: if esDocente() && get(ruta('ejercicios', id)).data.autorId == request.auth.uid;
+      }
+    }
+
+    // El catálogo es público; las consultas deben filtrar `publicado == true`.
+    match /quizzes/{id} {
+      allow read: if resource.data.publicado == true || esDocente();
+    }
+
+    // Solo el servidor escribe sesiones. Las consultas del docente deben filtrar por `autorQuizId`.
+    match /sesiones/{id} {
+      allow read: if autenticado()
+        && (resource.data.uid == request.auth.uid
+            || (esDocente() && resource.data.autorQuizId in [request.auth.uid, 'sistema']));
+    }
+  }
+}

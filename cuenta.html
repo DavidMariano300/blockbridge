@@ -1,0 +1,246 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mi cuenta · BlockBridge Academy</title>
+  <link rel="preload" href="fonts/atkinson-hyperlegible-next-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="css/app.css">
+  <script src="js/interfaz.js"></script>
+  <script type="module" src="js/cuenta.js"></script>
+</head>
+<body>
+  <a class="saltar" href="#contenido">Saltar al contenido</a>
+
+  <header class="encabezado">
+    <div class="contenedor encabezado__barra">
+      <a class="logo" href="index.html" aria-label="BlockBridge Academy, inicio">
+        <svg viewBox="0 0 32 32" aria-hidden="true"><rect x="3" y="5" width="18" height="9" rx="2" fill="currentColor"/><rect x="7" y="3" width="5" height="3" rx="1" fill="currentColor"/><rect x="11" y="18" width="18" height="9" rx="2" fill="currentColor" opacity=".55"/><rect x="15" y="16" width="5" height="3" rx="1" fill="currentColor" opacity=".55"/></svg>
+        <span>BlockBridge</span>
+      </a>
+      <button class="icono-boton" id="tema" type="button" aria-pressed="false" aria-label="Tema oscuro">
+        <svg class="tema-icono--luna" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z"/></svg>
+        <svg class="tema-icono--sol" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M4.6 4.6l1.4 1.4M18 18l1.4 1.4M2.5 12h2M19.5 12h2M4.6 19.4 6 18M18 6l1.4-1.4"/></svg>
+      </button>
+      <button class="icono-boton menu-boton" type="button" aria-expanded="false" aria-controls="menu" aria-label="Abrir menú">
+        <svg class="menu-boton__abrir" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+        <svg class="menu-boton__cerrar" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
+      </button>
+      <div class="menu" id="menu">
+        <nav class="navegacion" aria-label="Principal">
+          <a href="practica.html">Practicar</a>
+          <a href="index.html#como-funciona">Cómo funciona</a>
+          <a href="index.html#lenguajes">Lenguajes</a>
+          <a href="index.html#docentes">Para docentes</a>
+          <a href="index.html#quizzes">Quizzes</a>
+        </nav>
+        <div class="sesion" id="nav-sesion">
+          <a class="enlace-sesion" href="cuenta.html#entrar">Entrar</a>
+          <a class="boton boton--primario" href="cuenta.html#registro">Comenzar gratis</a>
+        </div>
+      </div>
+    </div>
+  </header>
+  <main id="contenido" class="contenedor pagina">
+    <p id="cargando" role="status">Cargando tu sesión…</p>
+
+    <section id="acceso" hidden>
+      <nav class="pestanas" aria-label="Acceso">
+        <a href="#entrar" id="tab-entrar">Entrar</a>
+        <a href="#registro" id="tab-registro">Crear cuenta</a>
+      </nav>
+
+      <div id="panel-entrar" hidden>
+        <div class="pagina__titulo">
+          <h1>Entra a tu cuenta</h1>
+          <p>Continúa donde te quedaste.</p>
+        </div>
+        <div class="tarjeta">
+          <form id="form-entrar">
+            <label>Correo electrónico <input type="email" name="correo" autocomplete="email" required></label>
+            <label>Contraseña <input type="password" name="contrasena" autocomplete="current-password" required></label>
+            <button type="submit" class="boton boton--primario">Entrar</button>
+            <p class="estado" role="status" aria-live="polite"></p>
+          </form>
+          <p><a href="#recuperar">¿Olvidaste tu contraseña?</a></p>
+        </div>
+      </div>
+
+      <div id="panel-recuperar" hidden>
+        <div class="pagina__titulo">
+          <h1>Recupera tu contraseña</h1>
+          <p>Te enviaremos un enlace para crear una nueva.</p>
+        </div>
+        <div class="tarjeta">
+          <form id="form-recuperar">
+            <label>Correo electrónico <input type="email" name="correo" autocomplete="email" required></label>
+            <button type="submit" class="boton boton--primario">Enviar enlace</button>
+            <p class="estado" role="status" aria-live="polite"></p>
+          </form>
+          <p><a href="#entrar">Volver a entrar</a></p>
+        </div>
+      </div>
+
+      <div id="panel-registro" hidden>
+        <div class="pagina__titulo">
+          <h1>Crea tu cuenta gratis</h1>
+          <p>Guarda tu progreso y consulta tu historial de quizzes desde cualquier dispositivo.</p>
+        </div>
+        <div class="tarjeta">
+          <form id="form-registro">
+            <p class="aviso" id="registro-invitado" hidden>Lo que hiciste como invitado se conservará en tu cuenta.</p>
+            <label>Apodo
+              <input type="text" name="apodo" autocomplete="nickname" minlength="3" maxlength="30" required aria-describedby="ayuda-apodo">
+              <span class="ayuda" id="ayuda-apodo">Así te verán tus docentes. Te recomendamos no usar tu nombre real.</span>
+            </label>
+            <label>Correo electrónico <input type="email" name="correo" autocomplete="email" required></label>
+            <label>Contraseña
+              <input type="password" name="contrasena" autocomplete="new-password" minlength="8"
+                     pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}" title="Al menos 8 caracteres, con mayúscula, minúscula, número y símbolo" required aria-describedby="ayuda-contrasena">
+              <span class="ayuda" id="ayuda-contrasena">Al menos 8 caracteres, con mayúscula, minúscula, número y símbolo.</span>
+            </label>
+            <p class="ayuda aviso-simplificado"></p>
+            <label class="casilla"><input type="checkbox" name="aviso" required> <span>He leído y acepto el <a href="privacidad.html" target="_blank">aviso de privacidad</a> y los <a href="terminos.html" target="_blank">términos de uso</a>.</span></label>
+            <label class="casilla"><input type="checkbox" name="edad" required> <span>Soy mayor de edad o cuento con autorización de mi madre, padre o tutor.</span></label>
+            <button type="submit" class="boton boton--primario">Crear cuenta</button>
+            <p class="estado" role="status" aria-live="polite"></p>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <section id="completar" hidden>
+      <div class="pagina__titulo">
+        <h1>Completa tu perfil</h1>
+        <p>Para continuar, confirma tu apodo y acepta el aviso de privacidad vigente.</p>
+      </div>
+      <div class="tarjeta">
+        <form id="form-completar">
+          <label>Apodo <input type="text" name="apodo" autocomplete="nickname" minlength="3" maxlength="30" required></label>
+          <p class="ayuda aviso-simplificado"></p>
+          <label class="casilla"><input type="checkbox" name="aviso" required> <span>He leído y acepto el <a href="privacidad.html" target="_blank">aviso de privacidad</a> y los <a href="terminos.html" target="_blank">términos de uso</a>.</span></label>
+          <label class="casilla"><input type="checkbox" name="edad" required> <span>Soy mayor de edad o cuento con autorización de mi madre, padre o tutor.</span></label>
+          <button type="submit" class="boton boton--primario">Continuar</button>
+          <p class="estado" role="status" aria-live="polite"></p>
+        </form>
+        <p><button type="button" class="boton--texto salir">Cerrar sesión</button></p>
+      </div>
+    </section>
+
+    <section id="mi-cuenta" hidden>
+      <div class="pagina__titulo">
+        <h1>Mi cuenta</h1>
+        <p>Tus datos de acceso y cómo te ven tus docentes.</p>
+      </div>
+      <div class="tarjeta">
+        <dl class="datos">
+          <dt>Correo</dt><dd id="dato-correo"></dd>
+          <dt>Rol</dt><dd id="dato-rol"></dd>
+          <dt>Verificación</dt><dd id="dato-verificado"></dd>
+        </dl>
+        <div class="acciones" id="acciones-verificar" hidden>
+          <button type="button" class="boton boton--secundario" id="reenviar">Reenviar correo de verificación</button>
+          <button type="button" class="boton boton--secundario" id="ya-verifique">Ya verifiqué mi correo</button>
+        </div>
+        <p class="estado" id="estado-verificar" role="status" aria-live="polite"></p>
+
+        <hr class="separador">
+
+        <form id="form-apodo">
+          <label>Apodo <input type="text" name="apodo" autocomplete="nickname" minlength="3" maxlength="30" required></label>
+          <div class="acciones"><button type="submit" class="boton boton--primario">Guardar apodo</button></div>
+          <p class="estado" role="status" aria-live="polite"></p>
+        </form>
+
+        <hr class="separador">
+
+        <button type="button" class="boton boton--secundario salir">Cerrar sesión</button>
+      </div>
+
+      <section class="cuenta__seccion" aria-labelledby="titulo-historial">
+        <h2 id="titulo-historial">Mi historial</h2>
+        <div class="tabla"><table class="docente__tabla">
+          <thead><tr><th scope="col">Quiz</th><th scope="col">Lenguaje</th><th scope="col">Fecha</th><th scope="col">Calificación</th><th scope="col">Estado</th></tr></thead>
+          <tbody id="filas-historial"></tbody>
+        </table></div>
+        <p class="vacio" id="historial-vacio" hidden>Todavía no has hecho ningún quiz. <a href="index.html#quizzes">Elige uno del catálogo</a>.</p>
+      </section>
+
+      <section class="cuenta__seccion" aria-labelledby="titulo-datos">
+        <h2 id="titulo-datos">Tus datos</h2>
+        <p class="pagina__texto">Puedes descargar todo lo que guardamos sobre ti o eliminar tu cuenta. Más detalles en el <a href="privacidad.html">aviso de privacidad</a>.</p>
+        <div class="acciones">
+          <button type="button" class="boton boton--secundario" id="descargar-datos">Descargar mis datos</button>
+          <button type="button" class="boton boton--peligro" id="abrir-eliminar">Eliminar mi cuenta</button>
+        </div>
+        <p class="estado" id="estado-datos" role="status" aria-live="polite"></p>
+      </section>
+
+      <dialog class="dialogo" id="dialogo-eliminar" aria-labelledby="titulo-eliminar">
+        <form id="form-eliminar" method="dialog">
+          <h2 id="titulo-eliminar">Eliminar tu cuenta</h2>
+          <p>Se borrarán tu perfil, tu historial y tus resultados. Si eres docente, tus ejercicios y quizzes se archivarán. No se puede deshacer.</p>
+          <label>Escribe ELIMINAR para confirmar <input type="text" name="confirmacion" autocomplete="off" required></label>
+          <label>Tu contraseña <input type="password" name="contrasena" autocomplete="current-password" required></label>
+          <p class="estado" role="status" aria-live="polite"></p>
+          <div class="acciones">
+            <button type="button" class="boton boton--secundario" id="cancelar-eliminar">Cancelar</button>
+            <button type="submit" class="boton boton--peligro">Eliminar definitivamente</button>
+          </div>
+        </form>
+      </dialog>
+    </section>
+
+    <section id="cuenta-eliminada" hidden>
+      <div class="pagina__titulo">
+        <h1>Tu cuenta fue eliminada</h1>
+        <p>Borramos tu perfil y tus resultados. Puedes seguir usando la práctica libre y los quizzes como invitado.</p>
+      </div>
+      <div class="acciones"><a class="boton boton--primario" href="index.html">Ir al inicio</a></div>
+    </section>
+  </main>
+
+  <footer class="pie">
+    <div class="contenedor">
+      <div class="pie__columnas">
+        <div class="pie__marca">
+          <a class="logo" href="index.html" aria-label="BlockBridge Academy, inicio">
+            <svg viewBox="0 0 32 32" aria-hidden="true"><rect x="3" y="5" width="18" height="9" rx="2" fill="currentColor"/><rect x="7" y="3" width="5" height="3" rx="1" fill="currentColor"/><rect x="11" y="18" width="18" height="9" rx="2" fill="currentColor" opacity=".55"/><rect x="15" y="16" width="5" height="3" rx="1" fill="currentColor" opacity=".55"/></svg>
+            <span>BlockBridge</span>
+          </a>
+          <p>Aprende a programar con bloques y quizzes calificados. Proyecto académico.</p>
+        </div>
+        <nav aria-labelledby="pie-producto">
+          <h2 id="pie-producto">Producto</h2>
+          <ul>
+            <li><a href="practica.html">Práctica libre</a></li>
+            <li><a href="index.html#como-funciona">Cómo funciona</a></li>
+            <li><a href="index.html#lenguajes">Lenguajes</a></li>
+            <li><a href="index.html#docentes">Para docentes</a></li>
+            <li><a href="index.html#quizzes">Quizzes</a></li>
+          </ul>
+        </nav>
+        <nav aria-labelledby="pie-cuenta">
+          <h2 id="pie-cuenta">Cuenta</h2>
+          <ul>
+            <li><a href="cuenta.html#registro">Crear cuenta</a></li>
+            <li><a href="cuenta.html#entrar">Entrar</a></li>
+            <li><a href="cuenta.html#recuperar">Recuperar contraseña</a></li>
+          </ul>
+        </nav>
+        <nav aria-labelledby="pie-legal">
+          <h2 id="pie-legal">Acerca de</h2>
+          <ul>
+            <li><a href="docs/pdf/00-vision-alcance-stack.pdf">Acerca del proyecto</a></li>
+            <li><a href="privacidad.html">Aviso de privacidad</a></li>
+            <li><a href="terminos.html">Términos de uso</a></li>
+          </ul>
+        </nav>
+      </div>
+      <div class="pie__base">
+        <p>© 2026 BlockBridge Academy</p>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>

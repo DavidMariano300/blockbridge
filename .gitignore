@@ -1,0 +1,8 @@
+node_modules/
+.vercel/
+.env*
+*serviceAccount*.json
+*.pem
+*-debug.log
+v1-respaldo.tar.gz
+.vercel

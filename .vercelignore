@@ -1,0 +1,15 @@
+v1-respaldo.tar.gz
+test
+scripts
+contenido
+*.log
+.claude
+*serviceAccount*.json
+.env*
+*.pem
+firebase.json
+firestore.rules
+firestore.indexes.json
+docs/*.md
+docs/*.sh
+docs/pdf/0[1-5]-*.pdf
